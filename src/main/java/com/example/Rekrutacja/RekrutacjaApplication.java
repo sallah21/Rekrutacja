@@ -20,6 +20,37 @@ public class RekrutacjaApplication {
 		int possiblePerm,maxLength,minLength,userLength;
 
 	}
+	static int factorial(int n)
+	{
+		int fact = 1;
+		for (int i = 2; i <= n; i++)
+			fact = fact * i;
+		return fact;
+	}
+
+	public static int posiblePermutations(String str){
+		int len = str.length();
+		final int MAX_CHAR = 26;
+		int[] freq = new int[MAX_CHAR];
+		for (int i = 0; i < len; i++)
+			if (str.charAt(i) >= 'a')
+				freq[str.charAt(i) - 'a']++;
+
+		// finding factorial of number of appearances
+		// and multiplying them since they are
+		// repeating alphabets
+		int fact = 1;
+		for (int i = 0; i < MAX_CHAR; i++)
+			fact = fact * factorial(freq[i]);
+
+		// finding factorial of size of string and
+		// dividing it by factorial found after
+		// multiplying
+		return factorial(len) / fact;
+	}
+	public static String insert(String str, char a , int b){
+		return str.substring(0,b) + a + str.substring(b);
+	}
 	public static HashSet<String>  Permut( String signs){
 		HashSet<String> output = new HashSet<String>();
 		if (signs == null){
@@ -34,7 +65,7 @@ public class RekrutacjaApplication {
 		HashSet<String> w = Permut(s);
 		for(String str:output){
 			for(int i = 0;i<=str.length();i++){
-				output.add(charInsert(str,first_let,i));
+				output.add(insert(str,first_let,i));
 			}
 		}
 		return output;
