@@ -36,16 +36,10 @@ public class RekrutacjaApplication {
 			if (str.charAt(i) >= 'a')
 				freq[str.charAt(i) - 'a']++;
 
-		// finding factorial of number of appearances
-		// and multiplying them since they are
-		// repeating alphabets
 		int fact = 1;
 		for (int i = 0; i < MAX_CHAR; i++)
 			fact = fact * factorial(freq[i]);
 
-		// finding factorial of size of string and
-		// dividing it by factorial found after
-		// multiplying
 		return factorial(len) / fact;
 	}
 	public static String insert(String str, char a , int b){
