@@ -1,24 +1,23 @@
 package com.example.Rekrutacja;
 
-import netscape.javascript.JSObject;
+
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.lang.Nullable;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.*;
 
 @SpringBootApplication
 @RestController
+@EnableAsync
 public class RekrutacjaApplication {
 
 	public static void main(String[] args) {
-
 		SpringApplication.run(RekrutacjaApplication.class, args);
-
 	}
 
 	static int factorial(int n)
@@ -94,29 +93,51 @@ public class RekrutacjaApplication {
             if (s.length()<minLen || s.length()>maxLen) {i.remove();}
             else{
                 Set<String> gg = permutationFinder(s);
-                System.out.println("gg "+gg);
+                //  System.out.println("gg "+gg);
+               // System.out.println("GG size "+ gg.size());
                 permutations.addAll(gg);
+                if (permutations.size() >= amount){
+                    break;
+                }
             }
+        }
+        substrings.clear();
+        System.out.println("Permutations size "+ permutations.size());
+        if(amount > permutations.size()){
+            throw new Exception("Amount of wanted strings is bigger than number of filtered strings");
         }
         List<String> part=new ArrayList<>(permutations);
         List<String> sub=part.subList(0, amount);
         permutations = new HashSet<>(sub);
         return permutations;
+
     }
-	@GetMapping("/hello")
-	public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
+	@GetMapping("/jobs")
+	public String jobs(@RequestParam(value = "name", defaultValue = "World") String name) {
 		return String.format("Hello %s!", name);
 	}
+    @GetMapping("/results")
+    public String results(){
+        return String.format("Hello");
+    }
 	@GetMapping("/")
 	public String start(){
         return String.format("To start write in url word, maxlength, minlength amount of strings");
 	}
 
     @PostMapping("/calculate")
-    public Set<String> calculate(@RequestParam(name = "word", defaultValue = "") String word, @RequestParam(name = "maxLength")  int maxLen, @RequestParam(name = "minLength") int minLen,@RequestParam(name = "amount") int amount) throws Exception {
+    public Set<String> calculate(@RequestParam(name = "word", defaultValue = "") String word, @Nullable @RequestParam(name = "maxLength" ,defaultValue ="2147483647",required=false)  int maxLen,  @Nullable @RequestParam(name = "minLength", defaultValue = "1",required=false) int minLen, @RequestParam(name = "amount") int amount) throws Exception {
         if (maxLen < minLen){
             throw new Exception("Max length is smaller than min length");
+        }
+        Set<String> result = task(word,maxLen,minLen,amount);
+        return result;
+    }
 
+    @GetMapping("/calculate")
+    public Set<String> calculate2(@RequestParam(name = "word", defaultValue = "") String word, @Nullable @RequestParam(name = "maxLength" ,defaultValue ="2147483647",required=false)  int maxLen,  @Nullable @RequestParam(name = "minLength", defaultValue = "1",required=false) int minLen, @RequestParam(name = "amount") int amount) throws Exception {
+        if (maxLen < minLen){
+            throw new Exception("Max length is smaller than min length");
         }
         Set<String> result = task(word,maxLen,minLen,amount);
         return result;
