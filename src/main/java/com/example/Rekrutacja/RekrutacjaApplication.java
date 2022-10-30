@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,7 @@ import java.util.*;
 @SpringBootApplication
 @RestController
 @EnableAsync
+@Controller
 public class RekrutacjaApplication {
 
 	public static void main(String[] args) {
@@ -83,6 +85,7 @@ public class RekrutacjaApplication {
 
     public static Set<String> task(String signs, int maxLen, int minLen,int amount) throws Exception{
         int possiblePerm =  posiblePermutations(signs);
+
         System.out.println("Possible permutations "+ possiblePerm);
         if (possiblePerm < amount){throw new Exception("Amount of strings wanted is bigger than the possible amount of them");}
         Set<String> substrings = subString(signs);
