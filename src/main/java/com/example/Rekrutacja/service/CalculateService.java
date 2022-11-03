@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -14,6 +15,31 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class CalculateService {
 
+
+    public resultRepository rep;
+    Object target;
+    Logger logger = LoggerFactory.getLogger(CalculateService.class);
+    @Async
+    public CompletableFuture<List<result>> saveResult(List<String> s )
+    {
+        UUID g = UUID.randomUUID();
+        List<result> results = new ArrayList<>();
+        for(String i:s){
+            final result r = new result();
+            r.setGeneration(g);
+            r.setValue(i);
+            results.add(r);
+        }
+        results = rep.saveAll(results);
+        return CompletableFuture.completedFuture(results);
+
+    }
+
+    @Async
+    public CompletableFuture<List<result>> findAllResults(){
+        List<result> results = rep.findAll();
+        return CompletableFuture.completedFuture(results);
+    }
     static int factorial(int n)
     {
         int fact = 1;
@@ -75,7 +101,7 @@ public class CalculateService {
         return begin + c + end;
     }
     @Async
-    public  Set<String> task(String signs, int maxLen, int minLen, int amount) throws Exception{
+    public  CompletableFuture<Set<String>> task(String signs, int maxLen, int minLen, int amount) throws Exception{
         int possiblePerm =  posiblePermutations(signs);
 
         System.out.println("Possible permutations "+ possiblePerm);
@@ -88,8 +114,6 @@ public class CalculateService {
             if (s.length()<minLen || s.length()>maxLen) {i.remove();}
             else{
                 Set<String> gg = permutationFinder(s);
-                //  System.out.println("gg "+gg);
-                // System.out.println("GG size "+ gg.size());
                 permutations.addAll(gg);
                 if (permutations.size() >= amount){
                     break;
@@ -104,8 +128,10 @@ public class CalculateService {
         List<String> part=new ArrayList<>(permutations);
         List<String> sub=part.subList(0, amount);
         permutations = new HashSet<>(sub);
-        //saveResult(permutations);
-        //return  new AsyncResult<String>(permutations).completable();
-        return permutations;
+        System.out.println(" pemutatuions " + permutations);
+
+            return CompletableFuture.completedFuture(permutations);
+
+
     }
 }
