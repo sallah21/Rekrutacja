@@ -1,19 +1,12 @@
-package com.example.Rekrutacja.service;
+package com.example.Rekrutacja;
 
-import com.example.Rekrutacja.entity.result;
-import com.example.Rekrutacja.repository.resultRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 public class CalculateService {
-
     static int factorial(int n)
     {
         int fact = 1;
@@ -104,8 +97,7 @@ public class CalculateService {
         List<String> part=new ArrayList<>(permutations);
         List<String> sub=part.subList(0, amount);
         permutations = new HashSet<>(sub);
-        //saveResult(permutations);
-        //return  new AsyncResult<String>(permutations).completable();
         return permutations;
+
     }
 }
