@@ -2,8 +2,7 @@ package com.example.Rekrutacja.service;
 
 import com.example.Rekrutacja.entity.result;
 import com.example.Rekrutacja.repository.resultRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -16,30 +15,24 @@ import java.util.concurrent.CompletableFuture;
 public class CalculateService {
 
 
-    public resultRepository rep;
-    Object target;
-    Logger logger = LoggerFactory.getLogger(CalculateService.class);
-    @Async
-    public CompletableFuture<List<result>> saveResult(List<String> s )
+
+
+    public Set<result> saveResult(Set<String> s )
     {
         UUID g = UUID.randomUUID();
-        List<result> results = new ArrayList<>();
+        Set<result> results = new HashSet<>();
         for(String i:s){
             final result r = new result();
-            r.setGeneration(g);
             r.setValue(i);
+            r.setGeneration(g);
+           // System.out.println(" R " + r);
+
             results.add(r);
         }
-        results = rep.saveAll(results);
-        return CompletableFuture.completedFuture(results);
-
+        return results;
     }
 
-    @Async
-    public CompletableFuture<List<result>> findAllResults(){
-        List<result> results = rep.findAll();
-        return CompletableFuture.completedFuture(results);
-    }
+
     static int factorial(int n)
     {
         int fact = 1;
@@ -48,19 +41,31 @@ public class CalculateService {
         return fact;
     }
 
-    public static int posiblePermutations(String str){
+    public static  long  posiblePermutations(String str){
         int len = str.length();
-        final int MAX_CHAR = 26;
-        int[] freq = new int[MAX_CHAR];
+        System.out.println("Considered string in posible permutations " + str);
+        final int MAX_CHAR = 50;
+        double[] freq = new double[MAX_CHAR];
         for (int i = 0; i < len; i++)
             if (str.charAt(i) >= 'a')
                 freq[str.charAt(i) - 'a']++;
 
         int fact = 1;
-        for (int i = 0; i < MAX_CHAR; i++)
-            fact = fact * factorial(freq[i]);
+        for (int i = 0; i < MAX_CHAR; i++) {
+                try {
+                    fact = fact * factorial((int) freq[i]);
+                }
+                catch (ArithmeticException e){
+                    System.out.println("Value exceeds range of long: " + fact);
+                    return Long.MAX_VALUE/Math.abs(fact);
+                }
+                }
+        if (factorial(len) <=0){
+            System.out.println("Result of posssible perm " +factorial(len) / fact );
+            return Long.MAX_VALUE/Math.abs(fact);
+        }
+        return   factorial(len) / fact;
 
-        return factorial(len) / fact;
     }
 
     public static Set<String> subString(String s){
@@ -102,12 +107,15 @@ public class CalculateService {
     }
     @Async
     public  CompletableFuture<Set<String>> task(String signs, int maxLen, int minLen, int amount) throws Exception{
-        int possiblePerm =  posiblePermutations(signs);
+        long possiblePerm =  posiblePermutations(signs);
 
         System.out.println("Possible permutations "+ possiblePerm);
+
         if (possiblePerm < amount){throw new Exception("Amount of strings wanted is bigger than the possible amount of them");}
         Set<String> substrings = subString(signs);
         Set<String> permutations = new HashSet<>();
+        System.out.println("substrings " + substrings);
+        System.out.println("sybstrings size " + substrings.size());
         Iterator<String> i = substrings.iterator();
         while (i.hasNext()) {
             String s = i.next();
@@ -115,23 +123,25 @@ public class CalculateService {
             else{
                 Set<String> gg = permutationFinder(s);
                 permutations.addAll(gg);
+               // System.out.println("Size of permutations "+ permutations.size());
                 if (permutations.size() >= amount){
                     break;
                 }
             }
         }
+
         substrings.clear();
-        System.out.println("Permutations size "+ permutations.size());
+       // System.out.println("Permutations size "+ permutations.size());
         if(amount > permutations.size()){
             throw new Exception("Amount of wanted strings is bigger than number of filtered strings");
         }
         List<String> part=new ArrayList<>(permutations);
         List<String> sub=part.subList(0, amount);
         permutations = new HashSet<>(sub);
-        System.out.println(" pemutatuions " + permutations);
-
+        sub.clear();
+        saveResult(permutations);
+        System.out.println(" pemutatuions " + permutations.size());
+        System.out.println("Active thread count during task " + Thread.activeCount());
             return CompletableFuture.completedFuture(permutations);
-
-
     }
 }

@@ -4,22 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "results")
+@Table(name = "RESULTS")
 @AllArgsConstructor
 @NoArgsConstructor
 public class result {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String value;
+    private String wart;
     private UUID generation;
 
     public UUID getGeneration() {
@@ -31,7 +28,7 @@ public class result {
     }
 
     public String getValue() {
-        return this.value;
+        return this.wart;
     }
 
     public void setGeneration(UUID generation) {
@@ -43,6 +40,6 @@ public class result {
     }
 
     public void setValue(String value) {
-        this.value = value;
+        this.wart = value;
     }
 }
