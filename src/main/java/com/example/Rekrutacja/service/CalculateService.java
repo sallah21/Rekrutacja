@@ -26,7 +26,6 @@ public class CalculateService {
             r.setValue(i);
             r.setGeneration(g);
            // System.out.println(" R " + r);
-
             results.add(r);
         }
         return results;
@@ -80,32 +79,38 @@ public class CalculateService {
         return substrings;
     }
 
-    public static Set<String> permutationFinder(String str) {
+    public static Set<String> permutationFinder(String str , int maxLen) {
         Set<String> perm = new HashSet<String>();
         //Handling error scenarios
         if (str == null) {
             return null;
-        } else if (str.length() == 0) {
-            perm.add("");
+}
+        else if (str.length() == 0) {
+                perm.add("");
+                return perm;
+                }
+                char initial = str.charAt(0); // first character
+                String rem = str.substring(1); // Full string without first character
+                Set<String> words = permutationFinder(rem, maxLen);
+        for (String strNew : words) {
+        for (int i = 0;i<=strNew.length();i++){
+        perm.add(charInsert(strNew, initial, i));
+        }
+        if (perm.size() >= maxLen)
+        {
             return perm;
         }
-        char initial = str.charAt(0); // first character
-        String rem = str.substring(1); // Full string without first character
-        Set<String> words = permutationFinder(rem);
-        for (String strNew : words) {
-            for (int i = 0;i<=strNew.length();i++){
-                perm.add(charInsert(strNew, initial, i));
-            }
+       // System.out.println("PERM " + perm.size());
         }
         return perm;
-    }
+        }
 
-    public static String charInsert(String str, char c, int j) {
+public static String charInsert(String str, char c, int j) {
         String begin = str.substring(0, j);
         String end = str.substring(j);
         return begin + c + end;
-    }
-    @Async
+        }
+@Async
     public  CompletableFuture<Set<String>> task(String signs, int maxLen, int minLen, int amount) throws Exception{
         long possiblePerm =  posiblePermutations(signs);
 
@@ -121,10 +126,11 @@ public class CalculateService {
             String s = i.next();
             if (s.length()<minLen || s.length()>maxLen) {i.remove();}
             else{
-                Set<String> gg = permutationFinder(s);
+                //System.out.println("considered string "+ s);
+                Set<String> gg = permutationFinder(s, maxLen);
                 permutations.addAll(gg);
-               // System.out.println("Size of permutations "+ permutations.size());
-                if (permutations.size() >= amount){
+                System.out.println("Size of permutations "+ permutations.size());
+                if (permutations.size() >= amount ||!i.hasNext()){
                     break;
                 }
             }
@@ -139,7 +145,6 @@ public class CalculateService {
         List<String> sub=part.subList(0, amount);
         permutations = new HashSet<>(sub);
         sub.clear();
-        saveResult(permutations);
         System.out.println(" pemutatuions " + permutations.size());
         System.out.println("Active thread count during task " + Thread.activeCount());
             return CompletableFuture.completedFuture(permutations);

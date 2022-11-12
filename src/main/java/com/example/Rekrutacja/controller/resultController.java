@@ -6,6 +6,7 @@ import com.example.Rekrutacja.service.CalculateService;
 import com.example.Rekrutacja.service.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +43,7 @@ public class resultController {
     public String start2(){
         return String.format("To start write in url /calculate word, maxlength, minlength amount of strings");
     }
+    @Async
     @PostMapping("/calculate")
     public Set<String> calculate(@RequestParam(name = "word", defaultValue = "") String word, @Nullable @RequestParam(name = "maxLength" ,defaultValue ="2147483647",required=false)  int maxLen, @Nullable @RequestParam(name = "minLength", defaultValue = "1",required=false) int minLen, @RequestParam(name = "amount") int amount) throws Exception {
         if (maxLen < minLen){
@@ -52,9 +54,9 @@ public class resultController {
 
         return result;
     }
-
+    @Async
     @GetMapping("/calculate")
-    public Set<String> calculate2(@RequestParam(name = "word", defaultValue = "") String word, @Nullable @RequestParam(name = "maxLength" ,defaultValue ="2147483647",required=false)  int maxLen,  @Nullable @RequestParam(name = "minLength", defaultValue = "1",required=false) int minLen, @RequestParam(name = "amount") int amount) throws Exception {
+    public Set<String> calculate2(@RequestParam(name = "word", defaultValue = "") String word, @Nullable @RequestParam(name = "maxLength" ,defaultValue ="10000",required=false)  int maxLen,  @Nullable @RequestParam(name = "minLength", defaultValue = "1",required=false) int minLen, @RequestParam(name = "amount") int amount) throws Exception {
 
         CalculateService calcserv = new CalculateService();
         if (maxLen < minLen){
@@ -64,7 +66,6 @@ public class resultController {
         Set<String> result = calcserv.task(word,maxLen,minLen,amount).get();
         rep.saveAll(calcserv.saveResult(result));
         System.out.println("Active thread cound after task " + Thread.activeCount());
-        //System.out.print("res " + result);
         return result;
     }
 }
